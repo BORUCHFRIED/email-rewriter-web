@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Email Rewriter</title>
+  <title>Text Helper</title>
   <style>
     body{font-family:Arial,system-ui,sans-serif;max-width:980px;margin:24px auto;padding:0 14px;background:#fafafa;color:#111}
     .box{background:#fff;border:1px solid #e7e7e7;border-radius:12px;padding:14px;margin-bottom:14px}
@@ -16,31 +16,31 @@
     .cardHead{display:flex;justify-content:space-between;gap:8px;align-items:center}
     .actions{display:flex;gap:8px}
     .status{font-size:13px;color:#666}
+    .hidden{display:none}
   </style>
 </head>
 <body>
-  <h1>Email Rewriter</h1>
+  <h1>Text Helper</h1>
 
   <div class="box">
     <div class="row">
-      <label>Language
+      <label>Mode
+        <select id="mode">
+          <option value="rewrite">Rewrite</option>
+          <option value="punctuation">Fix punctuation only</option>
+          <option value="summarize">Summarize</option>
+          <option value="translate">Translate</option>
+        </select>
+      </label>
+
+      <label id="langWrap">Language
         <select id="language">
           <option>English</option>
           <option>Hebrew</option>
         </select>
       </label>
 
-      <label>Intent
-        <select id="intent">
-          <option>Reply</option>
-          <option>Follow-up</option>
-          <option>Decline</option>
-          <option>Request info</option>
-          <option>Confirm details</option>
-        </select>
-      </label>
-
-      <label>Tone
+      <label id="toneWrap">Tone
         <select id="tone">
           <option>Professional</option>
           <option>Friendly</option>
@@ -50,7 +50,7 @@
         </select>
       </label>
 
-      <label>Length
+      <label id="lengthWrap">Length
         <select id="length">
           <option>Similar length</option>
           <option>Shorter</option>
@@ -58,14 +58,29 @@
         </select>
       </label>
 
-      <button id="go">Rewrite</button>
+      <label id="summaryWrap" class="hidden">Summary length
+        <select id="summaryLength">
+          <option value="short">Short</option>
+          <option value="medium">Medium</option>
+        </select>
+      </label>
+
+      <label id="translateWrap" class="hidden">Direction
+        <select id="translateDir">
+          <option value="he-en">Hebrew → English</option>
+          <option value="en-he">English → Hebrew</option>
+          <option value="auto">Auto-detect</option>
+        </select>
+      </label>
+
+      <button id="go">Run</button>
       <span class="status" id="status"></span>
     </div>
   </div>
 
   <div class="box">
-    <label>Paste email</label>
-    <textarea id="email" placeholder="Paste the email here..."></textarea>
+    <label>Paste text</label>
+    <textarea id="text" placeholder="Paste here..."></textarea>
   </div>
 
   <div id="results"></div>
@@ -77,52 +92,70 @@ const resultsEl = $("results");
 
 function setStatus(msg){ statusEl.textContent = msg || ""; }
 function esc(s){ return s.replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;" }[c])); }
-
 async function copy(text){ await navigator.clipboard.writeText(text); }
 
-function render(versions){
+function render(text, label){
   resultsEl.innerHTML = "";
-  versions.forEach(v => {
-    const card = document.createElement("div");
-    card.className = "card";
-    card.innerHTML = `
-      <div class="cardHead">
-        <strong>${esc(v.label || "Version")}</strong>
-        <div class="actions">
-          <button data-a="copy">Copy</button>
-        </div>
-      </div>
-      <pre>${esc(v.text || "")}</pre>
-    `;
-    card.querySelector('[data-a="copy"]').onclick = async () => {
-      await copy(v.text || "");
-      setStatus("Copied ✅");
-      setTimeout(()=>setStatus(""),1200);
-    };
-    resultsEl.appendChild(card);
-  });
+  const card = document.createElement("div");
+  card.className = "card";
+  card.innerHTML = `
+    <div class="cardHead">
+      <strong>${esc(label || "Result")}</strong>
+      <div class="actions"><button data-a="copy">Copy</button></div>
+    </div>
+    <pre>${esc(text || "")}</pre>
+  `;
+  card.querySelector('[data-a="copy"]').onclick = async () => {
+    await copy(text || "");
+    setStatus("Copied ✅");
+    setTimeout(()=>setStatus(""),1200);
+  };
+  resultsEl.appendChild(card);
 }
 
-$("go").onclick = async () => {
-  const emailText = $("email").value.trim();
-  if(!emailText){ setStatus("Paste an email first."); return; }
+function updateUI(){
+  const mode = $("mode").value;
 
-  setStatus("Rewriting...");
+  // Show only relevant controls
+  $("toneWrap").classList.toggle("hidden", mode !== "rewrite");
+  $("lengthWrap").classList.toggle("hidden", mode !== "rewrite");
+  $("langWrap").classList.toggle("hidden", mode === "translate"); // translate has its own direction control
+  $("summaryWrap").classList.toggle("hidden", mode !== "summarize");
+  $("translateWrap").classList.toggle("hidden", mode !== "translate");
+}
+
+$("mode").addEventListener("change", updateUI);
+updateUI();
+
+$("go").onclick = async () => {
+  const text = $("text").value.trim();
+  if(!text){ setStatus("Paste text first."); return; }
+
+  const mode = $("mode").value;
+
+  const payload = {
+    mode,
+    text,
+    options: {
+      language: $("language").value,
+      tone: $("tone").value,
+      length: $("length").value,
+      summaryLength: $("summaryLength").value,
+      translateDir: $("translateDir").value
+    }
+  };
+
+  setStatus("Working...");
   try{
-    const r = await fetch("/api/rewrite", {
+    const r = await fetch("/api/run", {
       method:"POST",
       headers:{ "Content-Type":"application/json" },
-      body: JSON.stringify({
-        emailText,
-        language: $("language").value,
-        intent: $("intent").value,
-        tone: $("tone").value,
-        length: $("length").value
-      })
+      body: JSON.stringify(payload)
     });
     const data = await r.json();
     if(!r.ok) throw new Error(data.error || "Request failed");
-    render(data.versions || []);
+
+    render(data.output || "", data.label || "Result");
     setStatus("Done ✅");
     setTimeout(()=>setStatus(""),1200);
   }catch(e){
