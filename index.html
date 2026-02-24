@@ -1,167 +1,546 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Text Helper</title>
+  <meta name="color-scheme" content="light dark" />
   <style>
-    body{font-family:Arial,system-ui,sans-serif;max-width:980px;margin:24px auto;padding:0 14px;background:#fafafa;color:#111}
-    .box{background:#fff;border:1px solid #e7e7e7;border-radius:12px;padding:14px;margin-bottom:14px}
-    textarea{width:100%;height:220px;resize:vertical;padding:12px;border-radius:10px;border:1px solid #ddd}
-    select,button{padding:10px;border-radius:10px;border:1px solid #ddd;background:#fff}
-    button{cursor:pointer;font-weight:600}
-    pre{white-space:pre-wrap;word-break:break-word;background:#f7f7f7;border:1px solid #eee;border-radius:10px;padding:12px}
-    .row{display:flex;flex-wrap:wrap;gap:10px;align-items:end}
-    .card{border:1px solid #e7e7e7;border-radius:12px;padding:12px;margin-top:12px;background:#fff}
-    .cardHead{display:flex;justify-content:space-between;gap:8px;align-items:center}
-    .actions{display:flex;gap:8px}
-    .status{font-size:13px;color:#666}
-    .hidden{display:none}
+    :root{
+      --bg: #0b0f17;
+      --panel: rgba(255,255,255,.06);
+      --panel-2: rgba(255,255,255,.08);
+      --border: rgba(255,255,255,.12);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.68);
+      --shadow: 0 12px 30px rgba(0,0,0,.35);
+      --radius: 18px;
+      --radius-sm: 14px;
+      --pad: 16px;
+      --gap: 12px;
+      --focus: rgba(110,168,254,.55);
+      --accent: #7c5cff;
+      --accent-2: #22c55e;
+      --danger: #ef4444;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+
+    @media (prefers-color-scheme: light){
+      :root{
+        --bg:#f6f7fb;
+        --panel:#ffffff;
+        --panel-2:#ffffff;
+        --border: rgba(15,23,42,.10);
+        --text: rgba(15,23,42,.92);
+        --muted: rgba(15,23,42,.62);
+        --shadow: 0 12px 30px rgba(15,23,42,.10);
+        --focus: rgba(59,130,246,.25);
+      }
+    }
+
+    *{ box-sizing: border-box; }
+    body{
+      margin:0;
+      font-family: var(--sans);
+      color: var(--text);
+      background:
+        radial-gradient(1200px 600px at 20% 10%, rgba(124,92,255,.25), transparent 60%),
+        radial-gradient(900px 500px at 80% 20%, rgba(34,197,94,.18), transparent 55%),
+        radial-gradient(1000px 600px at 50% 100%, rgba(59,130,246,.10), transparent 55%),
+        var(--bg);
+      min-height: 100vh;
+    }
+
+    .wrap{
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 22px 16px 38px;
+    }
+
+    .topbar{
+      display:flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .brand{
+      display:flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .brand h1{
+      margin:0;
+      font-size: 22px;
+      letter-spacing: .2px;
+    }
+    .brand p{
+      margin:0;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .pill{
+      display:flex;
+      align-items:center;
+      gap: 8px;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 420px 1fr;
+      gap: 14px;
+      align-items: start;
+    }
+    @media (max-width: 980px){
+      .grid{ grid-template-columns: 1fr; }
+    }
+
+    .card{
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .cardHeader{
+      padding: 14px 16px 12px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(to bottom, rgba(255,255,255,.06), transparent);
+    }
+    .cardHeader .title{
+      display:flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .cardHeader h2{
+      margin:0;
+      font-size: 14px;
+      letter-spacing: .2px;
+    }
+    .cardHeader .hint{
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .cardBody{ padding: 16px; }
+
+    .controls{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 520px){
+      .controls{ grid-template-columns: 1fr; }
+    }
+
+    label{
+      display:flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    select, textarea, button, input{
+      font-family: inherit;
+    }
+
+    select{
+      width: 100%;
+      padding: 11px 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--panel-2);
+      color: var(--text);
+      outline: none;
+    }
+    select:focus{
+      box-shadow: 0 0 0 4px var(--focus);
+      border-color: rgba(59,130,246,.55);
+    }
+
+    textarea{
+      width:100%;
+      height: 320px;
+      padding: 14px 14px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--panel-2);
+      color: var(--text);
+      outline: none;
+      resize: vertical;
+      line-height: 1.45;
+      font-size: 14px;
+    }
+    textarea:focus{
+      box-shadow: 0 0 0 4px var(--focus);
+      border-color: rgba(59,130,246,.55);
+    }
+
+    .actions{
+      display:flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: flex-end;
+      margin-top: 12px;
+    }
+
+    .btn{
+      border: 1px solid var(--border);
+      background: var(--panel-2);
+      color: var(--text);
+      padding: 11px 14px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 13px;
+      display:flex;
+      align-items:center;
+      gap: 8px;
+      transition: transform .05s ease, background .15s ease, border-color .15s ease;
+      user-select: none;
+    }
+    .btn:hover{ border-color: rgba(255,255,255,.22); }
+    .btn:active{ transform: translateY(1px); }
+    .btn:disabled{ opacity: .55; cursor: not-allowed; }
+
+    .btnPrimary{
+      background: linear-gradient(135deg, rgba(124,92,255,.95), rgba(59,130,246,.85));
+      border-color: rgba(124,92,255,.35);
+    }
+    .btnPrimary:hover{ border-color: rgba(124,92,255,.60); }
+
+    .btnGhost{
+      background: transparent;
+    }
+
+    .status{
+      font-size: 12px;
+      color: var(--muted);
+      margin-right: auto;
+      padding-left: 4px;
+    }
+
+    .resultBox{
+      padding: 14px 16px 16px;
+    }
+
+    .resultHeader{
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .resultHeader strong{
+      font-size: 13px;
+      letter-spacing: .2px;
+    }
+
+    pre{
+      margin:0;
+      white-space: pre-wrap;
+      word-break: break-word;
+      background: rgba(0,0,0,.14);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+      line-height: 1.55;
+      font-size: 14px;
+      color: var(--text);
+    }
+    @media (prefers-color-scheme: light){
+      pre{ background: rgba(15,23,42,.04); }
+    }
+
+    .hidden{ display:none; }
+
+    .kbd{
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(0,0,0,.12);
+      color: var(--muted);
+    }
+    @media (prefers-color-scheme: light){
+      .kbd{ background: rgba(15,23,42,.04); }
+    }
+
+    .rtl{ direction: rtl; text-align: right; }
   </style>
 </head>
+
 <body>
-  <h1>Text Helper</h1>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand">
+        <h1>Text Helper</h1>
+        <p>Rewrite • Punctuation • Summarize • Translate</p>
+      </div>
+      <div class="pill">
+        <span>Tip:</span>
+        <span class="kbd">Ctrl</span><span class="kbd">V</span> paste → <span class="kbd">Run</span>
+      </div>
+    </div>
 
-  <div class="box">
-    <div class="row">
-      <label>Mode
-        <select id="mode">
-          <option value="rewrite">Rewrite</option>
-          <option value="punctuation">Fix punctuation only</option>
-          <option value="summarize">Summarize</option>
-          <option value="translate">Translate</option>
-        </select>
-      </label>
+    <div class="grid">
+      <!-- Left: Controls -->
+      <div class="card">
+        <div class="cardHeader">
+          <div class="title">
+            <h2>Settings</h2>
+            <div class="hint" id="modeHint">Rewrite with tone & length</div>
+          </div>
+        </div>
 
-      <label id="langWrap">Language
-        <select id="language">
-          <option>English</option>
-          <option>Hebrew</option>
-        </select>
-      </label>
+        <div class="cardBody">
+          <div class="controls">
+            <label>
+              Mode
+              <select id="mode">
+                <option value="rewrite">Rewrite</option>
+                <option value="punctuation">Fix punctuation only</option>
+                <option value="summarize">Summarize</option>
+                <option value="translate">Translate</option>
+              </select>
+            </label>
 
-      <label id="toneWrap">Tone
-        <select id="tone">
-          <option>Professional</option>
-          <option>Friendly</option>
-          <option>Firm</option>
-          <option>Very polite</option>
-          <option>Short and direct</option>
-        </select>
-      </label>
+            <label id="langWrap">
+              Language
+              <select id="language">
+                <option>English</option>
+                <option>Hebrew</option>
+              </select>
+            </label>
 
-      <label id="lengthWrap">Length
-        <select id="length">
-          <option>Similar length</option>
-          <option>Shorter</option>
-          <option>Longer</option>
-        </select>
-      </label>
+            <label id="toneWrap">
+              Tone
+              <select id="tone">
+                <option>Professional</option>
+                <option>Friendly</option>
+                <option>Firm</option>
+                <option>Very polite</option>
+                <option>Short and direct</option>
+              </select>
+            </label>
 
-      <label id="summaryWrap" class="hidden">Summary length
-        <select id="summaryLength">
-          <option value="short">Short</option>
-          <option value="medium">Medium</option>
-        </select>
-      </label>
+            <label id="lengthWrap">
+              Length
+              <select id="length">
+                <option>Similar length</option>
+                <option>Shorter</option>
+                <option>Longer</option>
+              </select>
+            </label>
 
-      <label id="translateWrap" class="hidden">Direction
-        <select id="translateDir">
-          <option value="he-en">Hebrew → English</option>
-          <option value="en-he">English → Hebrew</option>
-          <option value="auto">Auto-detect</option>
-        </select>
-      </label>
+            <label id="summaryWrap" class="hidden">
+              Summary length
+              <select id="summaryLength">
+                <option value="short">Short</option>
+                <option value="medium">Medium</option>
+              </select>
+            </label>
 
-      <button id="go">Run</button>
-      <span class="status" id="status"></span>
+            <label id="translateWrap" class="hidden">
+              Direction
+              <select id="translateDir">
+                <option value="he-en">Hebrew → English</option>
+                <option value="en-he">English → Hebrew</option>
+                <option value="auto">Auto-detect</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="actions">
+            <div class="status" id="status"></div>
+            <button class="btn btnGhost" id="clear" type="button">Clear</button>
+            <button class="btn btnPrimary" id="go" type="button">Run</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Editor + Result -->
+      <div class="card">
+        <div class="cardHeader">
+          <div class="title">
+            <h2>Input</h2>
+            <div class="hint">Paste your text below</div>
+          </div>
+        </div>
+
+        <div class="cardBody">
+          <textarea id="text" placeholder="Paste here..."></textarea>
+        </div>
+
+        <div class="resultBox" id="resultBox">
+          <div class="resultHeader">
+            <strong id="resultLabel">Result</strong>
+            <button class="btn btnGhost" id="copyBtn" type="button" disabled>Copy</button>
+          </div>
+          <pre id="output">Your output will appear here.</pre>
+        </div>
+      </div>
     </div>
   </div>
-
-  <div class="box">
-    <label>Paste text</label>
-    <textarea id="text" placeholder="Paste here..."></textarea>
-  </div>
-
-  <div id="results"></div>
 
 <script>
-const $ = (id) => document.getElementById(id);
-const statusEl = $("status");
-const resultsEl = $("results");
+  const $ = (id) => document.getElementById(id);
 
-function setStatus(msg){ statusEl.textContent = msg || ""; }
-function esc(s){ return s.replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;" }[c])); }
-async function copy(text){ await navigator.clipboard.writeText(text); }
+  const modeEl = $("mode");
+  const languageEl = $("language");
+  const toneEl = $("tone");
+  const lengthEl = $("length");
+  const summaryLengthEl = $("summaryLength");
+  const translateDirEl = $("translateDir");
 
-function render(text, label){
-  resultsEl.innerHTML = "";
-  const card = document.createElement("div");
-  card.className = "card";
-  card.innerHTML = `
-    <div class="cardHead">
-      <strong>${esc(label || "Result")}</strong>
-      <div class="actions"><button data-a="copy">Copy</button></div>
-    </div>
-    <pre>${esc(text || "")}</pre>
-  `;
-  card.querySelector('[data-a="copy"]').onclick = async () => {
-    await copy(text || "");
-    setStatus("Copied ✅");
-    setTimeout(()=>setStatus(""),1200);
-  };
-  resultsEl.appendChild(card);
-}
+  const langWrap = $("langWrap");
+  const toneWrap = $("toneWrap");
+  const lengthWrap = $("lengthWrap");
+  const summaryWrap = $("summaryWrap");
+  const translateWrap = $("translateWrap");
 
-function updateUI(){
-  const mode = $("mode").value;
+  const modeHint = $("modeHint");
+  const statusEl = $("status");
+  const textEl = $("text");
+  const outputEl = $("output");
+  const resultLabelEl = $("resultLabel");
+  const copyBtn = $("copyBtn");
+  const goBtn = $("go");
+  const clearBtn = $("clear");
 
-  // Show only relevant controls
-  $("toneWrap").classList.toggle("hidden", mode !== "rewrite");
-  $("lengthWrap").classList.toggle("hidden", mode !== "rewrite");
-  $("langWrap").classList.toggle("hidden", mode === "translate"); // translate has its own direction control
-  $("summaryWrap").classList.toggle("hidden", mode !== "summarize");
-  $("translateWrap").classList.toggle("hidden", mode !== "translate");
-}
-
-$("mode").addEventListener("change", updateUI);
-updateUI();
-
-$("go").onclick = async () => {
-  const text = $("text").value.trim();
-  if(!text){ setStatus("Paste text first."); return; }
-
-  const mode = $("mode").value;
-
-  const payload = {
-    mode,
-    text,
-    options: {
-      language: $("language").value,
-      tone: $("tone").value,
-      length: $("length").value,
-      summaryLength: $("summaryLength").value,
-      translateDir: $("translateDir").value
-    }
-  };
-
-  setStatus("Working...");
-  try{
-    const r = await fetch("/api/run", {
-      method:"POST",
-      headers:{ "Content-Type":"application/json" },
-      body: JSON.stringify(payload)
-    });
-    const data = await r.json();
-    if(!r.ok) throw new Error(data.error || "Request failed");
-
-    render(data.output || "", data.label || "Result");
-    setStatus("Done ✅");
-    setTimeout(()=>setStatus(""),1200);
-  }catch(e){
-    setStatus("Error: " + e.message);
+  function setStatus(msg){ statusEl.textContent = msg || ""; }
+  function setOutput(label, text){
+    resultLabelEl.textContent = label || "Result";
+    outputEl.textContent = text || "";
+    copyBtn.disabled = !(text && text.trim().length);
   }
-};
+
+  function setRTLIfNeeded(mode, options, outputText){
+    // Use RTL when:
+    // - input language is Hebrew in rewrite/summarize/punctuation
+    // - translate target is Hebrew
+    const lang = options.language;
+    const dir = options.translateDir;
+
+    let rtl = false;
+    if (mode === "translate") {
+      rtl = (dir === "en-he") || (dir === "auto" && looksHebrew(outputText));
+    } else {
+      rtl = (lang === "Hebrew");
+    }
+
+    textEl.classList.toggle("rtl", rtl && mode !== "translate"); // input alignment based on chosen language
+    outputEl.classList.toggle("rtl", rtl);
+  }
+
+  function looksHebrew(s){
+    return /[\u0590-\u05FF]/.test(s || "");
+  }
+
+  function updateUI(){
+    const mode = modeEl.value;
+
+    toneWrap.classList.toggle("hidden", mode !== "rewrite");
+    lengthWrap.classList.toggle("hidden", mode !== "rewrite");
+    summaryWrap.classList.toggle("hidden", mode !== "summarize");
+    translateWrap.classList.toggle("hidden", mode !== "translate");
+    langWrap.classList.toggle("hidden", mode === "translate");
+
+    const hint =
+      mode === "rewrite" ? "Rewrite with tone & length" :
+      mode === "punctuation" ? "Fix punctuation and minor grammar only" :
+      mode === "summarize" ? "Short or medium summary" :
+      "Hebrew ↔ English translation";
+
+    modeHint.textContent = hint;
+
+    // Input RTL hint
+    const opts = collectOptions();
+    setRTLIfNeeded(mode, opts, outputEl.textContent);
+  }
+
+  function collectOptions(){
+    return {
+      language: languageEl.value,
+      tone: toneEl.value,
+      length: lengthEl.value,
+      summaryLength: summaryLengthEl.value,
+      translateDir: translateDirEl.value
+    };
+  }
+
+  modeEl.addEventListener("change", updateUI);
+  languageEl.addEventListener("change", updateUI);
+  translateDirEl.addEventListener("change", updateUI);
+
+  clearBtn.addEventListener("click", () => {
+    textEl.value = "";
+    setStatus("");
+    setOutput("Result", "Your output will appear here.");
+    updateUI();
+  });
+
+  copyBtn.addEventListener("click", async () => {
+    try{
+      await navigator.clipboard.writeText(outputEl.textContent || "");
+      setStatus("Copied ✅");
+      setTimeout(()=>setStatus(""), 1200);
+    }catch{
+      setStatus("Copy failed");
+    }
+  });
+
+  goBtn.addEventListener("click", async () => {
+    const text = (textEl.value || "").trim();
+    if (!text) { setStatus("Paste text first."); return; }
+
+    goBtn.disabled = true;
+    setStatus("Working…");
+    setOutput("Result", "");
+
+    const mode = modeEl.value;
+    const options = collectOptions();
+
+    try{
+      const r = await fetch("/api/run", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mode, text, options })
+      });
+
+      const data = await r.json();
+      if (!r.ok) throw new Error(data.error || "Request failed");
+
+      const out = data.output || "";
+      setOutput(data.label || "Result", out);
+      setRTLIfNeeded(mode, options, out);
+
+      setStatus("Done ✅");
+      setTimeout(()=>setStatus(""), 1200);
+    } catch(e){
+      setStatus("Error: " + e.message);
+      setOutput("Result", "");
+    } finally {
+      goBtn.disabled = false;
+    }
+  });
+
+  updateUI();
 </script>
 </body>
 </html>
