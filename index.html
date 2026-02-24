@@ -5,32 +5,29 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Text Helper</title>
   <meta name="color-scheme" content="light dark" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <style>
     :root{
       --bg: #0b0f17;
       --panel: rgba(255,255,255,.06);
-      --panel-2: rgba(255,255,255,.08);
+      --panel2: rgba(255,255,255,.08);
       --border: rgba(255,255,255,.12);
       --text: rgba(255,255,255,.92);
       --muted: rgba(255,255,255,.68);
       --shadow: 0 12px 30px rgba(0,0,0,.35);
       --radius: 18px;
       --radius-sm: 14px;
-      --pad: 16px;
-      --gap: 12px;
       --focus: rgba(110,168,254,.55);
       --accent: #7c5cff;
-      --accent-2: #22c55e;
-      --danger: #ef4444;
+      --accent2: #22c55e;
       --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
       --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
     }
-
     @media (prefers-color-scheme: light){
       :root{
         --bg:#f6f7fb;
         --panel:#ffffff;
-        --panel-2:#ffffff;
+        --panel2:#ffffff;
         --border: rgba(15,23,42,.10);
         --text: rgba(15,23,42,.92);
         --muted: rgba(15,23,42,.62);
@@ -38,7 +35,6 @@
         --focus: rgba(59,130,246,.25);
       }
     }
-
     *{ box-sizing: border-box; }
     body{
       margin:0;
@@ -51,42 +47,13 @@
         var(--bg);
       min-height: 100vh;
     }
-
-    .wrap{
-      max-width: 1080px;
-      margin: 0 auto;
-      padding: 22px 16px 38px;
-    }
-
-    .topbar{
-      display:flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-
-    .brand{
-      display:flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .brand h1{
-      margin:0;
-      font-size: 22px;
-      letter-spacing: .2px;
-    }
-    .brand p{
-      margin:0;
-      font-size: 13px;
-      color: var(--muted);
-    }
-
+    .wrap{ max-width: 1120px; margin: 0 auto; padding: 22px 16px 40px; }
+    .topbar{ display:flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 16px; }
+    .brand{ display:flex; align-items:center; gap: 10px; }
+    .brand img{ height: 40px; }
+    .brand .sub{ font-size: 13px; color: var(--muted); margin-top: 2px; }
     .pill{
-      display:flex;
-      align-items:center;
-      gap: 8px;
+      display:flex; align-items:center; gap: 8px;
       padding: 10px 12px;
       border: 1px solid var(--border);
       border-radius: 999px;
@@ -96,16 +63,11 @@
       font-size: 12px;
       white-space: nowrap;
     }
+    .kbd{ font-family: var(--mono); font-size: 11px; padding: 4px 8px; border-radius: 10px; border: 1px solid var(--border); background: rgba(0,0,0,.12); color: var(--muted); }
+    @media (prefers-color-scheme: light){ .kbd{ background: rgba(15,23,42,.04); } }
 
-    .grid{
-      display:grid;
-      grid-template-columns: 420px 1fr;
-      gap: 14px;
-      align-items: start;
-    }
-    @media (max-width: 980px){
-      .grid{ grid-template-columns: 1fr; }
-    }
+    .grid{ display:grid; grid-template-columns: 440px 1fr; gap: 14px; align-items: start; }
+    @media (max-width: 980px){ .grid{ grid-template-columns: 1fr; } }
 
     .card{
       background: var(--panel);
@@ -119,76 +81,62 @@
       border-bottom: 1px solid var(--border);
       background: linear-gradient(to bottom, rgba(255,255,255,.06), transparent);
     }
-    .cardHeader .title{
-      display:flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-    }
-    .cardHeader h2{
-      margin:0;
-      font-size: 14px;
-      letter-spacing: .2px;
-    }
-    .cardHeader .hint{
-      font-size: 12px;
-      color: var(--muted);
-    }
-
+    .cardHeader .title{ display:flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .cardHeader h2{ margin:0; font-size: 14px; letter-spacing: .2px; }
+    .cardHeader .hint{ font-size: 12px; color: var(--muted); }
     .cardBody{ padding: 16px; }
 
-    .controls{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-    @media (max-width: 520px){
-      .controls{ grid-template-columns: 1fr; }
-    }
+    .controls{ display:grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 520px){ .controls{ grid-template-columns: 1fr; } }
 
-    label{
-      display:flex;
-      flex-direction: column;
-      gap: 6px;
-      font-size: 12px;
-      color: var(--muted);
-    }
-
-    select, textarea, button, input{
-      font-family: inherit;
-    }
+    label{ display:flex; flex-direction: column; gap: 6px; font-size: 12px; color: var(--muted); }
+    select, textarea, button{ font-family: inherit; }
 
     select{
       width: 100%;
       padding: 11px 12px;
       border-radius: var(--radius-sm);
       border: 1px solid var(--border);
-      background: var(--panel-2);
+      background: var(--panel2);
       color: var(--text);
       outline: none;
     }
-    select:focus{
-      box-shadow: 0 0 0 4px var(--focus);
-      border-color: rgba(59,130,246,.55);
+    select:focus{ box-shadow: 0 0 0 4px var(--focus); border-color: rgba(59,130,246,.55); }
+
+    .toggleRow{
+      grid-column: 1 / -1;
+      display:flex;
+      flex-wrap:wrap;
+      gap: 10px 14px;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--panel2);
     }
+    .toggle{
+      display:flex;
+      align-items:center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--muted);
+      user-select: none;
+    }
+    .toggle input{ transform: translateY(1px); }
 
     textarea{
       width:100%;
-      height: 320px;
-      padding: 14px 14px;
+      height: 260px;
+      padding: 14px;
       border-radius: var(--radius);
       border: 1px solid var(--border);
-      background: var(--panel-2);
+      background: var(--panel2);
       color: var(--text);
       outline: none;
       resize: vertical;
       line-height: 1.45;
       font-size: 14px;
     }
-    textarea:focus{
-      box-shadow: 0 0 0 4px var(--focus);
-      border-color: rgba(59,130,246,.55);
-    }
+    textarea:focus{ box-shadow: 0 0 0 4px var(--focus); border-color: rgba(59,130,246,.55); }
 
     .actions{
       display:flex;
@@ -197,10 +145,9 @@
       justify-content: flex-end;
       margin-top: 12px;
     }
-
     .btn{
       border: 1px solid var(--border);
-      background: var(--panel-2);
+      background: var(--panel2);
       color: var(--text);
       padding: 11px 14px;
       border-radius: 999px;
@@ -216,71 +163,72 @@
     .btn:hover{ border-color: rgba(255,255,255,.22); }
     .btn:active{ transform: translateY(1px); }
     .btn:disabled{ opacity: .55; cursor: not-allowed; }
-
-    .btnPrimary{
-      background: linear-gradient(135deg, rgba(124,92,255,.95), rgba(59,130,246,.85));
-      border-color: rgba(124,92,255,.35);
-    }
+    .btnPrimary{ background: linear-gradient(135deg, rgba(124,92,255,.95), rgba(59,130,246,.85)); border-color: rgba(124,92,255,.35); }
     .btnPrimary:hover{ border-color: rgba(124,92,255,.60); }
+    .btnGhost{ background: transparent; }
 
-    .btnGhost{
-      background: transparent;
+    .status{ font-size: 12px; color: var(--muted); margin-right: auto; padding-left: 4px; }
+
+    .split{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
     }
+    @media (max-width: 980px){ .split{ grid-template-columns: 1fr; } }
 
-    .status{
-      font-size: 12px;
-      color: var(--muted);
-      margin-right: auto;
-      padding-left: 4px;
+    .panel{
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: rgba(0,0,0,.12);
+      overflow:hidden;
     }
+    @media (prefers-color-scheme: light){ .panel{ background: rgba(15,23,42,.04); } }
 
-    .resultBox{
-      padding: 14px 16px 16px;
-    }
-
-    .resultHeader{
+    .panelHead{
       display:flex;
       align-items:center;
       justify-content: space-between;
       gap: 10px;
-      margin-bottom: 10px;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 12px;
     }
-    .resultHeader strong{
-      font-size: 13px;
-      letter-spacing: .2px;
-    }
+    .panelBody{ padding: 12px; }
 
-    pre{
-      margin:0;
-      white-space: pre-wrap;
-      word-break: break-word;
-      background: rgba(0,0,0,.14);
-      border: 1px solid var(--border);
+    .outputEditable{
+      min-height: 220px;
+      padding: 12px;
       border-radius: var(--radius);
-      padding: 14px;
+      border: 1px solid var(--border);
+      background: var(--panel2);
+      color: var(--text);
+      outline: none;
       line-height: 1.55;
       font-size: 14px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .outputEditable:focus{ box-shadow: 0 0 0 4px var(--focus); border-color: rgba(59,130,246,.55); }
+
+    .chips{
+      display:flex;
+      flex-wrap:wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .chip{
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 8px 10px;
+      font-size: 12px;
       color: var(--text);
+      background: rgba(0,0,0,.10);
+      cursor: pointer;
     }
-    @media (prefers-color-scheme: light){
-      pre{ background: rgba(15,23,42,.04); }
-    }
+    @media (prefers-color-scheme: light){ .chip{ background: rgba(15,23,42,.04); } }
 
     .hidden{ display:none; }
-
-    .kbd{
-      font-family: var(--mono);
-      font-size: 11px;
-      padding: 4px 8px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: rgba(0,0,0,.12);
-      color: var(--muted);
-    }
-    @media (prefers-color-scheme: light){
-      .kbd{ background: rgba(15,23,42,.04); }
-    }
-
     .rtl{ direction: rtl; text-align: right; }
   </style>
 </head>
@@ -289,22 +237,25 @@
   <div class="wrap">
     <div class="topbar">
       <div class="brand">
-        <h1>Text Helper</h1>
-        <p>Rewrite • Punctuation • Summarize • Translate</p>
+        <img src="/logo.svg" alt="Logo">
+        <div>
+          <div style="font-weight:700; font-size:16px;">Text Helper</div>
+          <div class="sub">Rewrite • Punctuation • Summarize • Translate</div>
+        </div>
       </div>
       <div class="pill">
         <span>Tip:</span>
-        <span class="kbd">Ctrl</span><span class="kbd">V</span> paste → <span class="kbd">Run</span>
+        <span class="kbd">Ctrl</span><span class="kbd">Enter</span> run
       </div>
     </div>
 
     <div class="grid">
-      <!-- Left: Controls -->
+      <!-- Left: Settings -->
       <div class="card">
         <div class="cardHeader">
           <div class="title">
             <h2>Settings</h2>
-            <div class="hint" id="modeHint">Rewrite with tone & length</div>
+            <div class="hint" id="modeHint">Rewrite with presets + strict mode</div>
           </div>
         </div>
 
@@ -325,6 +276,19 @@
               <select id="language">
                 <option>English</option>
                 <option>Hebrew</option>
+              </select>
+            </label>
+
+            <label id="scenarioWrap">
+              Scenario preset
+              <select id="scenario">
+                <option value="general">General professional</option>
+                <option value="followup">Follow-up (no response)</option>
+                <option value="payment">Payment reminder</option>
+                <option value="confirm">Confirm details</option>
+                <option value="schedule">Scheduling / coordination</option>
+                <option value="support">Customer support reply</option>
+                <option value="supplier">Supplier negotiation</option>
               </select>
             </label>
 
@@ -364,6 +328,23 @@
                 <option value="auto">Auto-detect</option>
               </select>
             </label>
+
+            <div class="toggleRow" id="rewriteToggles">
+              <label class="toggle">
+                <input type="checkbox" id="strictMode">
+                Strict mode (don’t change numbers/dates/names)
+              </label>
+
+              <label class="toggle">
+                <input type="checkbox" id="whatsappMode">
+                WhatsApp format (short lines)
+              </label>
+
+              <label class="toggle">
+                <input type="checkbox" id="subjectLines">
+                Generate subject lines
+              </label>
+            </div>
           </div>
 
           <div class="actions">
@@ -374,25 +355,42 @@
         </div>
       </div>
 
-      <!-- Right: Editor + Result -->
+      <!-- Right: Side-by-side -->
       <div class="card">
         <div class="cardHeader">
           <div class="title">
-            <h2>Input</h2>
-            <div class="hint">Paste your text below</div>
+            <h2>Compare</h2>
+            <div class="hint">Output is editable. Select text → improve selection.</div>
           </div>
         </div>
 
         <div class="cardBody">
-          <textarea id="text" placeholder="Paste here..."></textarea>
-        </div>
+          <div class="split">
+            <div class="panel">
+              <div class="panelHead">
+                <span>Original</span>
+                <button class="btn btnGhost" id="copyOriginal" type="button">Copy</button>
+              </div>
+              <div class="panelBody">
+                <textarea id="text" placeholder="Paste here..."></textarea>
+              </div>
+            </div>
 
-        <div class="resultBox" id="resultBox">
-          <div class="resultHeader">
-            <strong id="resultLabel">Result</strong>
-            <button class="btn btnGhost" id="copyBtn" type="button" disabled>Copy</button>
+            <div class="panel">
+              <div class="panelHead">
+                <span id="resultLabel">Result</span>
+                <div style="display:flex; gap:8px;">
+                  <button class="btn btnGhost" id="copyOutput" type="button" disabled>Copy</button>
+                  <button class="btn btnGhost" id="improveSelection" type="button" disabled>Improve selection</button>
+                </div>
+              </div>
+              <div class="panelBody">
+                <div id="output" class="outputEditable" contenteditable="true">Your output will appear here.</div>
+              </div>
+            </div>
           </div>
-          <pre id="output">Your output will appear here.</pre>
+
+          <div class="chips hidden" id="subjectsBox"></div>
         </div>
       </div>
     </div>
@@ -403,115 +401,234 @@
 
   const modeEl = $("mode");
   const languageEl = $("language");
+  const scenarioEl = $("scenario");
   const toneEl = $("tone");
   const lengthEl = $("length");
   const summaryLengthEl = $("summaryLength");
   const translateDirEl = $("translateDir");
 
+  const strictModeEl = $("strictMode");
+  const whatsappModeEl = $("whatsappMode");
+  const subjectLinesEl = $("subjectLines");
+
   const langWrap = $("langWrap");
+  const scenarioWrap = $("scenarioWrap");
   const toneWrap = $("toneWrap");
   const lengthWrap = $("lengthWrap");
   const summaryWrap = $("summaryWrap");
   const translateWrap = $("translateWrap");
+  const rewriteToggles = $("rewriteToggles");
 
   const modeHint = $("modeHint");
   const statusEl = $("status");
+
   const textEl = $("text");
   const outputEl = $("output");
   const resultLabelEl = $("resultLabel");
-  const copyBtn = $("copyBtn");
+  const subjectsBox = $("subjectsBox");
+
+  const copyOriginalBtn = $("copyOriginal");
+  const copyOutputBtn = $("copyOutput");
+  const improveSelectionBtn = $("improveSelection");
+
   const goBtn = $("go");
   const clearBtn = $("clear");
 
   function setStatus(msg){ statusEl.textContent = msg || ""; }
-  function setOutput(label, text){
-    resultLabelEl.textContent = label || "Result";
-    outputEl.textContent = text || "";
-    copyBtn.disabled = !(text && text.trim().length);
-  }
+  function setLabel(label){ resultLabelEl.textContent = label || "Result"; }
 
-  function setRTLIfNeeded(mode, options, outputText){
-    // Use RTL when:
-    // - input language is Hebrew in rewrite/summarize/punctuation
-    // - translate target is Hebrew
-    const lang = options.language;
-    const dir = options.translateDir;
+  function looksHebrew(s){ return /[\u0590-\u05FF]/.test(s || ""); }
 
-    let rtl = false;
+  function setRTL(){
+    const mode = modeEl.value;
+    const options = collectOptions();
+
+    // input direction
     if (mode === "translate") {
-      rtl = (dir === "en-he") || (dir === "auto" && looksHebrew(outputText));
+      textEl.classList.toggle("rtl", false);
     } else {
-      rtl = (lang === "Hebrew");
+      textEl.classList.toggle("rtl", options.language === "Hebrew");
     }
 
-    textEl.classList.toggle("rtl", rtl && mode !== "translate"); // input alignment based on chosen language
-    outputEl.classList.toggle("rtl", rtl);
+    // output direction
+    const out = outputEl.innerText || "";
+    let rtlOut = false;
+    if (mode === "translate") {
+      rtlOut = (options.translateDir === "en-he") || (options.translateDir === "auto" && looksHebrew(out));
+    } else {
+      rtlOut = options.language === "Hebrew";
+    }
+    outputEl.classList.toggle("rtl", rtlOut);
+    subjectsBox.classList.toggle("rtl", rtlOut);
   }
 
-  function looksHebrew(s){
-    return /[\u0590-\u05FF]/.test(s || "");
+  function collectOptions(){
+    return {
+      language: languageEl.value,
+      scenario: scenarioEl.value,
+      tone: toneEl.value,
+      length: lengthEl.value,
+      summaryLength: summaryLengthEl.value,
+      translateDir: translateDirEl.value,
+      strictMode: !!strictModeEl.checked,
+      whatsappMode: !!whatsappModeEl.checked,
+      subjectLines: !!subjectLinesEl.checked
+    };
   }
 
   function updateUI(){
     const mode = modeEl.value;
 
-    toneWrap.classList.toggle("hidden", mode !== "rewrite");
-    lengthWrap.classList.toggle("hidden", mode !== "rewrite");
+    // visibility
+    const isRewrite = mode === "rewrite";
+    toneWrap.classList.toggle("hidden", !isRewrite);
+    lengthWrap.classList.toggle("hidden", !isRewrite);
+    scenarioWrap.classList.toggle("hidden", !isRewrite);
+    rewriteToggles.classList.toggle("hidden", !isRewrite);
+
     summaryWrap.classList.toggle("hidden", mode !== "summarize");
     translateWrap.classList.toggle("hidden", mode !== "translate");
     langWrap.classList.toggle("hidden", mode === "translate");
 
     const hint =
-      mode === "rewrite" ? "Rewrite with tone & length" :
+      mode === "rewrite" ? "Rewrite with presets + strict mode" :
       mode === "punctuation" ? "Fix punctuation and minor grammar only" :
       mode === "summarize" ? "Short or medium summary" :
       "Hebrew ↔ English translation";
 
     modeHint.textContent = hint;
 
-    // Input RTL hint
-    const opts = collectOptions();
-    setRTLIfNeeded(mode, opts, outputEl.textContent);
+    // subjects only relevant for rewrite
+    subjectsBox.classList.toggle("hidden", true);
+
+    setRTL();
   }
 
-  function collectOptions(){
-    return {
-      language: languageEl.value,
-      tone: toneEl.value,
-      length: lengthEl.value,
-      summaryLength: summaryLengthEl.value,
-      translateDir: translateDirEl.value
-    };
+  async function copyToClipboard(text){
+    await navigator.clipboard.writeText(text || "");
+    setStatus("Copied ✅");
+    setTimeout(()=>setStatus(""), 1200);
   }
 
-  modeEl.addEventListener("change", updateUI);
-  languageEl.addEventListener("change", updateUI);
-  translateDirEl.addEventListener("change", updateUI);
+  copyOriginalBtn.addEventListener("click", () => copyToClipboard(textEl.value || ""));
+  copyOutputBtn.addEventListener("click", () => copyToClipboard(outputEl.innerText || ""));
 
   clearBtn.addEventListener("click", () => {
     textEl.value = "";
+    outputEl.innerText = "Your output will appear here.";
+    setLabel("Result");
+    copyOutputBtn.disabled = true;
+    improveSelectionBtn.disabled = true;
+    subjectsBox.innerHTML = "";
+    subjectsBox.classList.add("hidden");
     setStatus("");
-    setOutput("Result", "Your output will appear here.");
     updateUI();
   });
 
-  copyBtn.addEventListener("click", async () => {
+  function getSelectedText(){
+    const sel = window.getSelection();
+    if (!sel) return "";
+    // only allow selection inside output
+    if (sel.rangeCount === 0) return "";
+    const range = sel.getRangeAt(0);
+    const container = range.commonAncestorContainer;
+    const inOutput = outputEl.contains(container.nodeType === 1 ? container : container.parentNode);
+    if (!inOutput) return "";
+    return sel.toString() || "";
+  }
+
+  function replaceSelection(newText){
+    const sel = window.getSelection();
+    if (!sel || sel.rangeCount === 0) return false;
+    const range = sel.getRangeAt(0);
+    const container = range.commonAncestorContainer;
+    const inOutput = outputEl.contains(container.nodeType === 1 ? container : container.parentNode);
+    if (!inOutput) return false;
+
+    range.deleteContents();
+    range.insertNode(document.createTextNode(newText));
+    sel.removeAllRanges();
+    return true;
+  }
+
+  // enable/disable improve selection button based on selection changes
+  document.addEventListener("selectionchange", () => {
+    const selected = getSelectedText();
+    improveSelectionBtn.disabled = !(selected && selected.trim().length);
+  });
+
+  improveSelectionBtn.addEventListener("click", async () => {
+    const selected = getSelectedText().trim();
+    const full = (outputEl.innerText || "").trim();
+    if (!selected) { setStatus("Select text first."); return; }
+    if (!full) { setStatus("No output yet."); return; }
+
+    improveSelectionBtn.disabled = true;
+    setStatus("Improving selection…");
+
+    const options = collectOptions();
     try{
-      await navigator.clipboard.writeText(outputEl.textContent || "");
-      setStatus("Copied ✅");
+      const r = await fetch("/api/run", {
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body: JSON.stringify({
+          mode: "edit_selection",
+          text: full,
+          selection: selected,
+          options
+        })
+      });
+      const data = await r.json();
+      if(!r.ok) throw new Error(data.error || "Request failed");
+
+      const replacement = (data.output || "").trim();
+      if (!replacement) throw new Error("Empty replacement");
+
+      const ok = replaceSelection(replacement);
+      if (!ok) throw new Error("Selection replace failed");
+
+      copyOutputBtn.disabled = !(outputEl.innerText.trim().length);
+      setRTL();
+      setStatus("Done ✅");
       setTimeout(()=>setStatus(""), 1200);
-    }catch{
-      setStatus("Copy failed");
+    }catch(e){
+      setStatus("Error: " + e.message);
+    }finally{
+      // will re-enable on selectionchange anyway
+      improveSelectionBtn.disabled = !(getSelectedText().trim().length);
     }
   });
+
+  function renderSubjects(subjects){
+    subjectsBox.innerHTML = "";
+    if (!subjects || !subjects.length) {
+      subjectsBox.classList.add("hidden");
+      return;
+    }
+    subjectsBox.classList.remove("hidden");
+
+    subjects.forEach((s) => {
+      const chip = document.createElement("button");
+      chip.className = "chip";
+      chip.type = "button";
+      chip.textContent = s;
+      chip.onclick = () => copyToClipboard(s);
+      subjectsBox.appendChild(chip);
+    });
+  }
 
   goBtn.addEventListener("click", async () => {
     const text = (textEl.value || "").trim();
     if (!text) { setStatus("Paste text first."); return; }
 
     goBtn.disabled = true;
+    improveSelectionBtn.disabled = true;
+    copyOutputBtn.disabled = true;
+
     setStatus("Working…");
-    setOutput("Result", "");
+    setLabel("Result");
+    subjectsBox.innerHTML = "";
+    subjectsBox.classList.add("hidden");
 
     const mode = modeEl.value;
     const options = collectOptions();
@@ -526,19 +643,35 @@
       const data = await r.json();
       if (!r.ok) throw new Error(data.error || "Request failed");
 
-      const out = data.output || "";
-      setOutput(data.label || "Result", out);
-      setRTLIfNeeded(mode, options, out);
+      setLabel(data.label || "Result");
+      outputEl.innerText = data.output || "";
+      copyOutputBtn.disabled = !(outputEl.innerText.trim().length);
+
+      renderSubjects(data.subjects || []);
+      setRTL();
 
       setStatus("Done ✅");
       setTimeout(()=>setStatus(""), 1200);
     } catch(e){
       setStatus("Error: " + e.message);
-      setOutput("Result", "");
+      outputEl.innerText = "";
+      copyOutputBtn.disabled = true;
     } finally {
       goBtn.disabled = false;
     }
   });
+
+  // Ctrl+Enter shortcut
+  document.addEventListener("keydown", (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+      e.preventDefault();
+      goBtn.click();
+    }
+  });
+
+  modeEl.addEventListener("change", updateUI);
+  languageEl.addEventListener("change", updateUI);
+  translateDirEl.addEventListener("change", updateUI);
 
   updateUI();
 </script>
